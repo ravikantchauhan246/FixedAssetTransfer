@@ -1,0 +1,6 @@
+@FixedAssetTransfer_HostAddress = http://localhost:5160
+
+GET {{FixedAssetTransfer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
