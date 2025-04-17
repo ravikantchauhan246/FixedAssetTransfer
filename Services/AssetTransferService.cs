@@ -263,7 +263,7 @@ public class AssetTransferService
         return userRoles.Contains("Requestor") || userRoles.Contains("Admin");
     }
 
-    private AssetTransferDto MapToDto(AssetTransfer transfer)
+    private static AssetTransferDto MapToDto(AssetTransfer transfer)
     {
         return new AssetTransferDto
         {
