@@ -223,11 +223,12 @@ using (var scope = app.Services.CreateScope())
 
 app.UseHttpsRedirection();
 
-// Enable CORS if needed (configure appropriately for production)
+// Configure CORS - single configuration
 app.UseCors(builder => builder
-    .AllowAnyOrigin()
+    .WithOrigins("http://localhost:4200")
     .AllowAnyMethod()
-    .AllowAnyHeader());
+    .AllowAnyHeader()
+    .AllowCredentials());
 
 app.UseAuthentication();
 app.UseAuthorization();

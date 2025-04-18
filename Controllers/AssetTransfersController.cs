@@ -55,6 +55,10 @@ public class AssetTransfersController : ControllerBase
         var transfer = await _assetTransferService.CreateTransfer(transferDto, userId);
         if (transfer == null)
         {
+            if (!string.IsNullOrEmpty(transferDto.RecipientId))
+            {
+                return BadRequest("Invalid recipient ID. The specified user does not exist.");
+            }
             return BadRequest("Could not create transfer");
         }
         return CreatedAtAction(nameof(GetById), new { id = transfer.Id }, transfer);

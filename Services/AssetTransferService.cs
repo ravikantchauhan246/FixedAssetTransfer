@@ -110,6 +110,26 @@ public class AssetTransferService
 
     public async Task<AssetTransferDto?> CreateTransfer(CreateAssetTransferDto transferDto, string requestorId)
     {
+        // Validate requestor exists
+        var requestor = await _userManager.FindByIdAsync(requestorId);
+        if (requestor == null)
+        {
+            return null;
+        }
+
+        string? validatedRecipientId = null;
+        // Validate recipient if specified
+        if (!string.IsNullOrEmpty(transferDto.RecipientId))
+        {
+            var recipient = await _userManager.FindByIdAsync(transferDto.RecipientId);
+            if (recipient == null)
+            {
+                // Recipient doesn't exist
+                return null;
+            }
+            validatedRecipientId = recipient.Id; // Use the validated recipient ID
+        }
+
         var transfer = new AssetTransfer
         {
             RequestorId = requestorId,
@@ -123,12 +143,25 @@ public class AssetTransferService
             NewOwner = transferDto.NewOwner,
             PurposeOfTransfer = transferDto.PurposeOfTransfer,
             Justification = transferDto.Justification,
-            RecipientId = transferDto.RecipientId,
+            RecipientId = validatedRecipientId, // Use the validated ID or null
             Status = TransferStatus.Draft
         };
 
         _context.AssetTransfers.Add(transfer);
-        await _context.SaveChangesAsync();
+        
+        try {
+            await _context.SaveChangesAsync();
+        }
+        catch (Microsoft.EntityFrameworkCore.DbUpdateException ex)
+        {
+            // Log the exception
+            System.Console.WriteLine($"Database error when creating transfer: {ex.Message}");
+            if (ex.InnerException != null)
+            {
+                System.Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+            }
+            return null;
+        }
 
         return await GetTransferById(transfer.Id);
     }
